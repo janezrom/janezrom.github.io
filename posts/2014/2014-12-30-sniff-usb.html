@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>My Hakyll Blog - Snif USB</title>
+        <link rel="stylesheet" href="../../css/default.css" />
+    </head>
+    <body>
+        <header>
+            <div class="logo">
+                <a href="../../">My Hakyll Blog</a>
+            </div>
+            <nav>
+                <a href="../../">Home</a>
+                <a href="../../about.html">About</a>
+                <a href="../../contact.html">Contact</a>
+                <a href="../../archive.html">Archive</a>
+            </nav>
+        </header>
+
+        <main role="main">
+            <h1>Snif USB</h1>
+            <article>
+    <section class="header">
+        Posted on December 30, 2014
+        
+            by Janez Rom
+        
+    </section>
+    <section>
+        <pre><code>   for
+
+import collections
+
+logfile = open(&quot;yourlogfile.log&quot;, &quot;r&quot;)
+
+clean_log=[]
+
+for line in logfile:
+    try:
+        # copy the URLS to an empty list.
+        # We get the part between GET and HTTP
+        clean_log.append(line[line.index(&quot;GET&quot;)+4:line.index(&quot;HTTP&quot;)])
+    except:
+        pass
+
+counter = collections.Counter(clean_log)
+
+# get the Top 50 most popular URLs
+for count in counter.most_common(50):
+    print(str(count[1]) + &quot;\t&quot; + str(count[0]))
+
+logfile.close()</code></pre>
+<h1 id="create-acces-for-regular-user">Create acces for regular user</h1>
+<p>The rcx5 uses a driver based on libusb. To access the device without root privileges create an udev rule</p>
+<pre><code>/etc/udev/rules.d/99-hid.rules
+
+SUBSYSTEM==&quot;usb&quot;, ATTRS{idVendor}==&quot;0da4&quot;, ATTRS{idProduct}==&quot;0004&quot;, MODE=&quot;0666&quot;</code></pre>
+<p>for details see https://github.com/samop/Polar-Flowlink-linux/tree/master/udev</p>
+<h1 id="usb-sniffing-with-usbmon-and-virtual-usb-analyser">USB sniffing with usbmon and virtual USB analyser</h1>
+<h2 id="installation">Installation</h2>
+<p>I’m using virtual usb analyser and usbmon. Install them by:</p>
+<pre><code>yaourt -S vusb-analyzer usbmon usbdump</code></pre>
+<p>Configure if needed:</p>
+<pre><code>mount -t debugfs none_debugs /sys/kernel/debug
+modprobe usbmon</code></pre>
+<h2 id="usage">Usage</h2>
+<p>allow regular user to sniff:</p>
+<pre><code>sudo chmod +rx /sys/kernel/debug/
+sudo chmod a+rw /sys/kernel/debug/usb/usbmon/*</code></pre>
+<p>Verify that bus sockets are present.</p>
+<pre><code>ls /sys/kernel/debug/usb/usbmon
+
+0s  0u  1s  1t  1u  2s  2t  2u  3s  3t  3u  4s  4t  4u</code></pre>
+<p>Run</p>
+<pre><code>cat /sys/kernel/debug/usb/devices&quot;,</code></pre>
+<p>and find the T-line which corresponds to the device. Usually you do it by looking for the vendor string. If you have many similar devices, unplug one and compare the two</p>
+<pre><code>/sys/kernel/debug/usb/devices outputs.</code></pre>
+<p>The T-line will have a bus number.</p>
+<p>Example:</p>
+<pre><code>T:  Bus=01 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#= 30 Spd=12   MxCh= 0
+D:  Ver= 2.00 Cls=00(&gt;ifc ) Sub=00 Prot=00 MxPS=32 #Cfgs=  1
+P:  Vendor=0da4 ProdID=0004 Rev= 0.01
+S:  Manufacturer=Polar Electro Oy
+S:  Product=Polar DataLink</code></pre>
+<p>Start</p>
+<pre><code>cat /sys/kernel/debug/usb/usbmon/1u &gt; ~/1u.mon</code></pre>
+<p>to listen device on bus number 1 or start</p>
+<pre><code>sudo cat /sys/kernel/debug/usb/usbmon/0u &gt; ~/0u.mon</code></pre>
+<p>which listenis all devices. Finaly start:</p>
+<pre><code>vusb-mon 0u.mon</code></pre>
+<h1 id="usb-sniffing-with-wireshark">USB sniffing with wireshark</h1>
+<h2 id="installation-1">Installation</h2>
+<p>Alternativly you can use wireshark.</p>
+<pre><code>yaourt -S wireshark-cli wireshark-qt</code></pre>
+<p>To run wireshark as normal user you have to add yourself into wireshark group</p>
+<pre><code>gpasswd -a username wireshark</code></pre>
+<p>Run kernel usb module</p>
+<pre><code>modprobe usbmon
+mount -t usbfs /dev/bus/usb /proc/bus/usb</code></pre>
+<p>To make your session aware of this new group until without login in again, you can use</p>
+<pre><code>newgrp wireshark</code></pre>
+<h2 id="usage-1">Usage</h2>
+<p>For security reasons tshark refuses to be run as root. So I needed to change some file access rights.</p>
+<pre><code>sudo chmod +rx /sys/kernel/debug/
+sudo chmod a+rw /sys/kernel/debug/usb/usbmon/*</code></pre>
+<p>Finnaly usw it with</p>
+<pre><code>tshark -i usbmon2 -w trace1.pcap</code></pre>
+<h2 id="capture-analysis">Capture analysis</h2>
+<p>The file trace1.pcap contains the USB frames and can be displayed using the graphical interface of Wireshark.</p>
+<p>Tell Wireshark to decode the USB frames as USBCCID. Go in the menu “Analyze” -&gt; “Decode as…” and select USBCCID in the dialog.</p>
+<h1 id="references">References</h1>
+<p><a href="https://www.kernel.org/doc/Documentation/usb/usbmon.txt" class="uri">https://www.kernel.org/doc/Documentation/usb/usbmon.txt</a></p>
+<p><a href="http://ludovicrousseau.blogspot.com/2014/10/ccid-usb-spy-using-wireshark.html" class="uri">http://ludovicrousseau.blogspot.com/2014/10/ccid-usb-spy-using-wireshark.html</a></p>
+<p><a href="http://superuser.com/questions/81233/wireshark-permission-problem-in-ubuntu" class="uri">http://superuser.com/questions/81233/wireshark-permission-problem-in-ubuntu</a></p>
+<p><a href="http://vusb-analyzer.sourceforge.net/" class="uri">http://vusb-analyzer.sourceforge.net/</a></p>
+<p><a href="http://ubertooth.sourceforge.net/" class="uri">http://ubertooth.sourceforge.net/</a></p>
+<p><a href="http://sourceforge.net/p/ubertooth/mailman/message/31779735/" class="uri">http://sourceforge.net/p/ubertooth/mailman/message/31779735/</a></p>
+<p><a href="http://dan3lmi.blogspot.com/2012/10/sniffing-usb-traffic-different.html" class="uri">http://dan3lmi.blogspot.com/2012/10/sniffing-usb-traffic-different.html</a></p>
+<p><a href="http://wiki.wireshark.org/CaptureSetup/USB" class="uri">http://wiki.wireshark.org/CaptureSetup/USB</a></p>
+<p><a href="http://www.firstdigest.com/2009/05/wiresharks-most-useful-display-filters/" class="uri">http://www.firstdigest.com/2009/05/wiresharks-most-useful-display-filters/</a></p>
+<p><a href="http://www.cisco.com/c/en/us/td/docs/switches/lan/catalyst3650/software/release/3se/network_management/configuration_guide/b_nm_3se_3650_cg/b_nm_3se_3650_cg_chapter_01000.html" class="uri">http://www.cisco.com/c/en/us/td/docs/switches/lan/catalyst3650/software/release/3se/network_management/configuration_guide/b_nm_3se_3650_cg/b_nm_3se_3650_cg_chapter_01000.html</a></p>
+    </section>
+</article>
+
+        </main>
+
+        <footer>
+            Site proudly generated by
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </footer>
+    </body>
+</html>

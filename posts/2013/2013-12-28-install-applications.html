@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>My Hakyll Blog - Install applications</title>
+        <link rel="stylesheet" href="../../css/default.css" />
+    </head>
+    <body>
+        <header>
+            <div class="logo">
+                <a href="../../">My Hakyll Blog</a>
+            </div>
+            <nav>
+                <a href="../../">Home</a>
+                <a href="../../about.html">About</a>
+                <a href="../../contact.html">Contact</a>
+                <a href="../../archive.html">Archive</a>
+            </nav>
+        </header>
+
+        <main role="main">
+            <h1>Install applications</h1>
+            <article>
+    <section class="header">
+        Posted on December 28, 2013
+        
+            by Janez Rom
+        
+    </section>
+    <section>
+        <h1 id="basic-applications">Basic applications</h1>
+<pre><code>pacman -S mc gvim
+packer -S ranger rxvt-unicode
+pacman -S zip unzip p7zip arj unarj atool
+
+pacman -S firefox thunderbird</code></pre>
+<p>Change font size of firefox developper window</p>
+<pre><code>cd /home/&lt;user&gt;/.mozilla/firefox/&lt;default-pr0file&gt;
+
+mkdir chrome
+cd chrome
+
+vim userChrome.css</code></pre>
+<p>and put in</p>
+<pre><code>@namespace url(http://www.w3.org/1999/xhtml);
+@-moz-document regexp(&quot;chrome://browser/content/devtools/.*&quot;) {
+    * { font-size: 20px !important }
+}
+
+pacman -S libreoffice
+pacman -S texlive-most texlive-lang lyx
+
+pacman -S alsa-lib alsa-tools alsa-utils alsa-plugins</code></pre>
+<p>Alsa applications are <code>alsamixer</code> and <code>alsactl store</code></p>
+<h1 id="aditional-applications">Aditional applications</h1>
+<pre><code>pacman -S flashplugin
+
+pacman -S mpd ncmpcpp
+pacman -S clang git
+
+pacman -S cclive
+# Other youtube applications: movgrab youtube-dl minitube
+
+pacman -S gparted gksu dosfstools ntfsprogs gpart mtools</code></pre>
+<p>Run with “gksu gparted”</p>
+<pre><code>pacman -S k3b</code></pre>
+<p>Show k3b dependencies</p>
+<pre><code>pacman -Qi k3b
+pacman -S dvd+rw-tools vcdimager transcode emovix cdrdao
+
+pacman -S transmission-qt
+
+pacman -S mariadb
+
+pacman -S gimp darktable feh imagemagick
+pacman -S devede mencoder gstreamer0.10-plugins mutagen
+pacman -S dos2unix
+
+pacman -S geogebra
+pacman -S sage-mathematics
+
+yaourt -S opencascade</code></pre>
+<p>Make bigger tmpfs</p>
+<pre><code>nano /etc/fstab # tmpfs = 1/2 RAM</code></pre>
+<p>by</p>
+<pre><code>tmpfs /tmp tmpfs nodev,nosuid,size=4G 0 0</code></pre>
+<p>to be ble to compile opencscade.</p>
+<pre><code>yaourt -S elmer
+yaourt -S freecad</code></pre>
+<h1 id="skype">Skype</h1>
+<pre><code>nano /etc/pacman.conf</code></pre>
+<p>Find and uncomment 2 multilib lines</p>
+<pre><code>[multilib]
+Include = /etc/pacman.d/mirrorlist</code></pre>
+<p>and run</p>
+<pre><code>pacman -Syu
+yaourt -S skype lib32-v4l-utils</code></pre>
+<h1 id="light-browsers">Light browsers</h1>
+<pre><code>yaourt -S jumanji-git webkitgtk3
+yaourt -S dwb-gtk3-git
+yaourt -S uzbl-git</code></pre>
+<h1 id="light-pdf-viewer">Light pdf viewer</h1>
+<pre><code>yaourt -S mupdf zathura</code></pre>
+<p>Optional dependencies for zathura zathura-djvu zathura-pdf-poppler zathura-pdf-mupdf zathura-ps</p>
+<h1 id="developpement">Developpement</h1>
+<pre><code>yaourt -S kdevelop codeblocks</code></pre>
+<h1 id="mapping-tools">Mapping tools</h1>
+<pre><code>yaourt -S freeplane</code></pre>
+<h1 id="raytracers">Raytracers</h1>
+<pre><code>yaourt -S povray yafaray pixie luxrender aqsis sunflow radiance</code></pre>
+<h1 id="video">Video</h1>
+<pre><code>yaourt -S avidemux-gtk</code></pre>
+<h1 id="cli-spreadsheet-applications">CLI spreadsheet applications</h1>
+<pre><code>sc slsc vim-orgmode Spreadsheet.vim oleo</code></pre>
+<h1 id="security">Security</h1>
+<p>Security scanner, zenmap (gui)</p>
+<pre><code>pacman -S nmap zenmap</code></pre>
+<h1 id="ideas">Ideas</h1>
+<p>tig - Curses based git repo browser. I mainly use the command line but this is handy for browsing a repo. hub is a command-line wrapper for git that makes you better at GitHub.</p>
+<p>winff - WinFF is a GUI for the command line video converter, FFMPEG.</p>
+<p>aur/sndfile-tools spectrogram : sndfile-spectrogram “05 - A Love Supreme.flac” 800 800 spec.png spec</p>
+<p>duply is a frontend for the mighty duplicity</p>
+<p>https://github.com/dotphiles/dotphiles</p>
+<h1 id="arch-wiki-offline">arch wiki offline</h1>
+<pre><code>pacman -S arch-wiki-docs</code></pre>
+<h1 id="spell">spell</h1>
+<p>yaourt -S vim-spell-en vim-spell-sl vim-spell-fr yaourt -S aspell-en aspell-sl aspell-fr</p>
+<h1 id="ebook">ebook</h1>
+<pre><code>pacman -S lucidor</code></pre>
+<p>coolreader = cr3</p>
+    </section>
+</article>
+
+        </main>
+
+        <footer>
+            Site proudly generated by
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </footer>
+    </body>
+</html>
